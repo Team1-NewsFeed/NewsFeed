@@ -1,4 +1,4 @@
-package com.sparta.newsfeedproject.service;
+package com.sparta.newsfeed.service;
 
 import lombok.Getter;
 import org.springframework.stereotype.Service;

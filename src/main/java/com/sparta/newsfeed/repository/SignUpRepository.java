@@ -1,6 +1,6 @@
-package com.sparta.newsfeedproject.repository;
+package com.sparta.newsfeed.repository;
 
-import com.sparta.newsfeedproject.entity.SignUp;
+import com.sparta.newsfeed.entity.SignUp;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SignUpRepository extends JpaRepository<SignUp, Long> {

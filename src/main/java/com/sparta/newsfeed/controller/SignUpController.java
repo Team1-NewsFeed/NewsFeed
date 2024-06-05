@@ -1,4 +1,4 @@
-package com.sparta.newsfeedproject.controller;
+package com.sparta.newsfeed.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -1,4 +1,4 @@
-package com.sparta.newsfeedproject.entity;
+package com.sparta.newsfeed.entity;
 
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
