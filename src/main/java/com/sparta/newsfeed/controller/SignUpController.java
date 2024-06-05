@@ -18,7 +18,7 @@ public class SignUpController {
     @Autowired
     SignUpService signUpService;
 
-    // TODO : 회원가입 api
+    // 회원가입 api
     @PostMapping("/user/signup")
     public ResponseEntity<MessageResponseDto> addUser(@RequestBody SignUpRequestDto requestDto) {
         signUpService.addUser(requestDto);
@@ -28,7 +28,13 @@ public class SignUpController {
 
     // TODO : 로그인 api
     @PostMapping("/user/login")
-    public ResponseEntity<SignUpResponseDto> loginUser(@RequestBody SignUpRequestDto requestDto) {
-        return null;
+    public ResponseEntity<MessageResponseDto> loginUser(@RequestBody SignUpRequestDto requestDto) {
+        boolean login = signUpService.loginUser(requestDto);
+
+        if (!login) {
+            return ResponseEntity.badRequest().body(new MessageResponseDto("로그인에 실패했습니다."));
+        }
+
+        return ResponseEntity.ok(new MessageResponseDto("로그인에 성공했습니다."));
     }
 }

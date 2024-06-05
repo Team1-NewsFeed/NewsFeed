@@ -11,7 +11,9 @@ public class Signup {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long sign_up_id;
 
+
     @NotBlank(message = "아이디는 비워둘 수 없습니다.")
+//    @Column(name = "user_id")
     private String user_id;
 
     @NotBlank(message = "유저이름은 비워둘 수 없습니다.")

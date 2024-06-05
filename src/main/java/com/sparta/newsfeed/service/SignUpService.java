@@ -28,4 +28,17 @@ public class SignUpService {
 
         return signUpRepository.save(signup);
     }
+
+    // 유저 로그인 메서드
+    public boolean loginUser(SignUpRequestDto requestDto) {
+        Signup signup = signUpRepository.findByUser_id(requestDto.getUser_id());
+
+        if (!signup.getUser_id().equals(requestDto.getUser_id())) {
+            throw new IllegalArgumentException("존재하지 않는 아이디 입니다");
+        }
+        if (!signup.getPassword().equals(requestDto.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다");
+        }
+        return true;
+    }
 }
