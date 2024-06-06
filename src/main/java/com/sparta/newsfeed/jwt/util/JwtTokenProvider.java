@@ -4,7 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import com.sparta.newsfeed.jwt.config.JwtConfig; // 수정: JwtConfig 클래스 import 추가
+import com.sparta.newsfeed.jwt.config.JwtConfig;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -22,7 +22,6 @@ public final class JwtTokenProvider {
     }
 
     private JwtTokenProvider() {
-
     }
 
     public static String generateToken(String userId) {
@@ -51,10 +50,10 @@ public final class JwtTokenProvider {
 
     private static Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY) // 토큰을 서명한 비밀 키를 설정.
-                .build() // JWT 파서 발드함
-                .parseClaimsJws(token)// 토큰을 파싱하여 클레임을 추출한다.
-                .getBody(); // 파싱된 클레임을 반환한다.
+                .setSigningKey(SECRET_KEY)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     public static Boolean validateToken(String token) {

@@ -81,21 +81,54 @@ public class SignUpService {
     // 로그아웃 메서드
     // 로그아웃시 리프레쉬 토큰 없애기.
     public void logoutUser(String token) {
-        System.out.println("로그아웃 요청을 받았습니다: " + token);
-        if (!JwtTokenProvider.isTokenValid(token)) {
-            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
-        }
+        try {
+            System.out.println("로그아웃 요청을 받았습니다: " + token);
+            if (!JwtTokenProvider.isTokenValid(token)) {
+                throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+            }
 
-        String userId = JwtTokenProvider.extractUsername(token);
-        System.out.println("로그아웃할 사용자 ID: " + userId);
-        User user = userRepository.findByUserId(userId);
-        if (user != null) {
-            System.out.println("로그아웃 요청 사용자: " + userId);
-            user.setRefresh_token(null); // 로그아웃시 리프레쉬 토큰 초기화 하기.
-            userRepository.save(user);
-            System.out.println("리프레쉬 토큰 초기화 완료: " + userId);
-        } else {
-            System.out.println("사용자를 찾을 수 없습니다: " + userId);
+            String userId = JwtTokenProvider.extractUsername(token);
+            System.out.println("로그아웃할 사용자 ID: " + userId);
+            User user = userRepository.findByUserId(userId);
+            if (user != null) {
+                System.out.println("로그아웃 요청 사용자: " + userId);
+                user.setRefresh_token(null); // 로그아웃시 리프레쉬 토큰 초기화 하기.
+                userRepository.save(user);
+                System.out.println("리프레쉬 토큰 초기화 완료: " + userId);
+            } else {
+                System.out.println("사용자를 찾을 수 없습니다: " + userId);
+            }
+        } catch (Exception e) {
+            System.out.println("로그아웃 과정에서 예외 발생: " + e.getMessage());
+            throw e;
         }
     }
+
+    // 회원 탈퇴 메서드
+    public void deleteUser(String userId, String password) {
+        System.out.println("회원 탈퇴 요청을 받았습니다: " + userId);
+        User user = userRepository.findByUserId(userId);
+        if (user == null) {
+            throw new IllegalArgumentException("유저 아이디가 올바르지 않습니다.");
+        }
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new IllegalArgumentException("유저 비밀번호가 올바르지 않습니다.");
+        }
+
+        if (user.getUserStatus() == UserStatus.WITHDRAWAL) {
+            throw new IllegalArgumentException("이미 탈퇴한 사용자입니다.");
+        }
+
+        user.setUserStatus(UserStatus.WITHDRAWAL);
+        userRepository.save(user);
+        System.out.println("사용자 " + userId + "가 성공적으로 탈퇴되었습니다.");
+    }
 }
+
+
+
+
+
+
+

@@ -21,6 +21,7 @@ import java.util.Map;
 public class SignUpController {
     private final SignUpService signUpService;
 
+    // 회원가입
     @PostMapping("/user/signup")
     public ResponseEntity<MessageResponseDto> addUser(@Valid @RequestBody SignUpRequestDto requestDto) {
         signUpService.addUser(requestDto);
@@ -28,6 +29,7 @@ public class SignUpController {
         return new ResponseEntity<>(messageResponseDto, HttpStatus.CREATED);
     }
 
+    // 로그인
     @PostMapping("/user/login")
     public ResponseEntity<MessageResponseDto> loginUser(@Valid @RequestBody SignUpRequestDto requestDto) {
         Map<String, String> tokens = signUpService.loginUser(requestDto);
@@ -38,12 +40,23 @@ public class SignUpController {
         return new ResponseEntity<>(messageResponseDto, headers, HttpStatus.OK);
     }
 
-
+    // 로그아웃
+    // TODO : 현재 필터에서 제대로 넘겨주지 못하는 에러가 발생. 디버깅만 3시간 했지만 찾지 못하였음
     @PostMapping("/user/logout")
     public ResponseEntity<MessageResponseDto> logoutUser(@RequestHeader("Authorization") String accessToken) {
         signUpService.logoutUser(accessToken.replace("Bearer ", ""));
         MessageResponseDto messageResponseDto = new MessageResponseDto("로그아웃 성공");
         return new ResponseEntity<>(messageResponseDto, HttpStatus.OK);
+    }
+
+    // 회원 탈퇴 api
+    @PostMapping("/user/delete")
+    public ResponseEntity<MessageResponseDto> deleteUser(@RequestHeader("Authorization") String accessToken, @Valid @RequestBody SignUpRequestDto requestDto) {
+        String userId = JwtTokenProvider.extractUsername(accessToken.replace("Bearer ", ""));
+        signUpService.deleteUser(userId, requestDto.getPassword());
+        MessageResponseDto messageResponseDto = new MessageResponseDto("회원탈퇴 성공");
+        return new ResponseEntity<>(messageResponseDto, HttpStatus.OK);
+
     }
 
 }

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SignUpRequestDto {
 
-    @NotBlank(message = "유저 이름은 비워둘 수 없습니다.")
+    @NotBlank(message = "사용자 아이디는 비워둘 수 없습니다.")
     @Size(min = 10, max = 20, message = "사용자 ID는 최소 10글자 이상, 최대 20글자 이하여야 합니다.")
     @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "사용자 ID는 대소문자 포함 영문과 숫자만 허용됩니다.")
     private String userId;
