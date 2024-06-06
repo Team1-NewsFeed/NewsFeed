@@ -11,6 +11,9 @@ import java.io.IOException;
 @Component
 public class JwtFilter implements Filter {
 
+    // 아직 토큰을 발급받기 전인 부분에 대해서 필터링을 건너뛸 경로
+    private static final String[] EXCLUDED_PATHS = {"/user/signup"};
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {}
 
@@ -23,6 +26,15 @@ public class JwtFilter implements Filter {
 
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
         HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
+        String requestPath = httpServletRequest.getRequestURI();
+
+        // 필터링에서 제외할 부분 건너뛰기
+        for (String path : EXCLUDED_PATHS) {
+            if(path.equals(requestPath)){
+                filterChain.doFilter(servletRequest, servletResponse);
+                return;
+            }
+        }
 
         String authorizationHeader = httpServletRequest.getHeader("Authorization");
 
