@@ -1,4 +1,5 @@
 package com.sparta.newsfeed.jwt.filter;
+
 import com.sparta.newsfeed.jwt.util.JwtTokenProvider;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.*;
@@ -11,29 +12,25 @@ import java.io.IOException;
 @Component
 public class JwtFilter implements Filter {
 
-    // 아직 토큰을 발급받기 전인 부분에 대해서 필터링을 건너뛸 경로
-    private static final String[] EXCLUDED_PATHS = {"/user/signup"};
+    private static final String[] EXCLUDED_PATHS = {"/user/signup", "/user/login"};
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {}
+    public void init(FilterConfig filterConfig) throws ServletException {
+    }
 
     @Override
     public void doFilter(ServletRequest servletRequest,
                          ServletResponse servletResponse,
                          FilterChain filterChain) throws IOException, ServletException {
 
-        System.out.println("DO FILTER ");
+        System.out.println("필터 작동 !!");
 
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
         HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
 
-        // 무언가 작업을 할 URI 가져오기
         String requestPath = httpServletRequest.getRequestURI();
-
-        // 필터링에서 제외할 부분 건너뛰기
-        // requestPath 에 저장되어있는 URI 주소를 사용해 제한을 건다.
         for (String path : EXCLUDED_PATHS) {
-            if(path.equals(requestPath)){
+            if (path.equals(requestPath)) {
                 filterChain.doFilter(servletRequest, servletResponse);
                 return;
             }
@@ -44,10 +41,7 @@ public class JwtFilter implements Filter {
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String token = authorizationHeader.substring(7);
             try {
-                String username = JwtTokenProvider.extractUsername(token);
-
-                if (JwtTokenProvider.validateToken(token, username)) {
-                    httpServletRequest.setAttribute("username", username);
+                if (JwtTokenProvider.validateToken(token)) {
                     filterChain.doFilter(servletRequest, servletResponse);
                 } else {
                     httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "토큰이 유효하지 않습니다.");
@@ -61,5 +55,6 @@ public class JwtFilter implements Filter {
     }
 
     @Override
-    public void destroy() {}
+    public void destroy() {
+    }
 }

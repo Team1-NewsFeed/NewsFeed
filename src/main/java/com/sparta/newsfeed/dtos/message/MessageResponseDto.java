@@ -12,4 +12,8 @@ public class MessageResponseDto {
         this.message = message;
         this.token = token;
     }
+
+    public MessageResponseDto(String message) {
+        this.message = message;
+    }
 }

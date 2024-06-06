@@ -23,11 +23,12 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())  // CSRF 보호 비활성화
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/user/signup").permitAll()  // 회원가입 경로는 인증 없이 접근 허용
+                        .requestMatchers("/user/signup","/user/login").permitAll() // 회원가입 경로는 인증 없이 접근 허용
+                        // 그외 요청을 모두 인증이 필요하게 설정.
                         .anyRequest().authenticated()
                 );
 
-        http.addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class);  // JWT 필터 등록
+        http.addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class); // JWT 필터 등록
 
         return http.build();
     }

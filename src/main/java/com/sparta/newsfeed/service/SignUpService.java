@@ -2,12 +2,19 @@ package com.sparta.newsfeed.service;
 
 import com.sparta.newsfeed.dtos.signup.SignUpRequestDto;
 import com.sparta.newsfeed.entity.User;
+import com.sparta.newsfeed.entity.UserStatus;
 import com.sparta.newsfeed.jwt.util.JwtTokenProvider;
 import com.sparta.newsfeed.repository.UserRepository;
+import jakarta.validation.Validation;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import jakarta.validation.Validator;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @Getter
@@ -15,6 +22,7 @@ public class SignUpService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Autowired
     public SignUpService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
@@ -23,21 +31,71 @@ public class SignUpService {
     }
 
     // 유저 회원가입 메서드
-    public String addUser(SignUpRequestDto requestDto) {
+    public User addUser(SignUpRequestDto requestDto) {
+        // 중복된 사용자 ID 확인
+        User existingUser = userRepository.findByUserId(requestDto.getUserId());
+        if (existingUser != null && existingUser.getUserStatus() == UserStatus.ACTIVE) {
+            throw new IllegalArgumentException("중복된 사용자 ID입니다.");
+        }
+
+        // 탈퇴한 사용자 ID 확인
+        if (existingUser != null && existingUser.getUserStatus() == UserStatus.WITHDRAWAL) {
+            throw new IllegalArgumentException("탈퇴한 사용자 ID입니다.");
+        }
+
         User user = new User();
-
         user.setUser_id(requestDto.getUserId());
-        // 입력받은 비밀번호 암호화.
         user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
-        user.setUsername(requestDto.getUsername());
-        user.setEmail(requestDto.getEmail());
-        user.setOne_liner(requestDto.getOne_liner());
-
-        userRepository.save(user);
-        // 회원가입시 JWT 토큰 생성하는 로직
-        return JwtTokenProvider.generateToken(user.getUserId());
+        user.setUserStatus(UserStatus.ACTIVE);  // 기본 상태를 ACTIVE로 설정
+        return userRepository.save(user);
     }
 
     // 유저 로그인 메서드
+    public Map<String, String> loginUser(SignUpRequestDto requestDto) {
+        User user = userRepository.findByUserId(requestDto.getUserId());
+        if (user == null) {
+            throw new IllegalArgumentException("유저 아이디가 올바르지 않습니다.");
+        }
 
+        if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("유저 비밀번호가 올바르지 않습니다.");
+        }
+
+        if (user.getUserStatus() == UserStatus.WITHDRAWAL) {
+            throw new IllegalArgumentException("이미 탈퇴한 사용자 입니다.");
+        }
+
+        // 로그인 시 액세스 토큰 및 리프레시 토큰 생성 및 저장
+        String accessToken = JwtTokenProvider.generateToken(user.getUserId());
+        String refreshToken = JwtTokenProvider.generateRefreshToken(user.getUserId());
+        user.setRefresh_token(refreshToken);
+        userRepository.save(user);
+
+        Map<String, String> tokens = new HashMap<>();
+        tokens.put("accessToken", accessToken);
+        tokens.put("refreshToken", refreshToken);
+
+        return tokens;
+    }
+
+    // 로그아웃 메서드
+    // 로그아웃시 리프레쉬 토큰 없애기.
+    public void logoutUser(String token) {
+        System.out.println("로그아웃 요청을 받았습니다: " + token);
+        if (!JwtTokenProvider.isTokenValid(token)) {
+            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+        }
+
+        String userId = JwtTokenProvider.extractUsername(token);
+        System.out.println("로그아웃할 사용자 ID: " + userId);
+        User user = userRepository.findByUserId(userId);
+        if (user != null) {
+            System.out.println("로그아웃 요청 사용자: " + userId);
+            user.setRefresh_token(null); // 로그아웃시 리프레쉬 토큰 초기화 하기.
+            userRepository.save(user);
+            System.out.println("리프레쉬 토큰 초기화 완료: " + userId);
+        } else {
+            System.out.println("사용자를 찾을 수 없습니다: " + userId);
+        }
+    }
 }
