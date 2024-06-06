@@ -26,9 +26,12 @@ public class JwtFilter implements Filter {
 
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
         HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
+
+        // 무언가 작업을 할 URI 가져오기
         String requestPath = httpServletRequest.getRequestURI();
 
         // 필터링에서 제외할 부분 건너뛰기
+        // requestPath 에 저장되어있는 URI 주소를 사용해 제한을 건다.
         for (String path : EXCLUDED_PATHS) {
             if(path.equals(requestPath)){
                 filterChain.doFilter(servletRequest, servletResponse);
