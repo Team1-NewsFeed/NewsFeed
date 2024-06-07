@@ -1,4 +1,4 @@
-package com.sparta.newsfeed.dtos.signup;
+package com.sparta.newsfeed.dto;
 
 import com.sparta.newsfeed.entity.UserStatus;
 import jakarta.validation.constraints.Email;
