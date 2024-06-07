@@ -26,8 +26,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        String requestPath = request.getRequestURI();
+        System.out.println("필터가 요청되었습니다.");
 
+        String requestPath = request.getRequestURI();
+        // 로그인 요청은 인증없이 작동하도록 설정.
         if (requestPath.equals("/user/login")) {
             filterChain.doFilter(request, response);
             return;

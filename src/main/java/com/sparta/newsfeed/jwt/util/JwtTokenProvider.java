@@ -1,3 +1,4 @@
+// JwtTokenProvider.java
 package com.sparta.newsfeed.jwt.util;
 
 import io.jsonwebtoken.Claims;
@@ -8,9 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class JwtTokenProvider {
@@ -18,6 +17,9 @@ public class JwtTokenProvider {
     private final SecretKey secretKey;
     private final long accessExpiration;
     private final long refreshExpiration;
+
+    // 유효하지 않은 토큰 목록을 저장할 컬랙션
+    private final Set<String> invalidatedTokens = new HashSet<>();
 
     public JwtTokenProvider(@Value("${jwt.secret.key}") String secretKey,
                             @Value("${jwt.access.expiration}") long accessExpiration,
@@ -61,6 +63,10 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String token) {
         try {
+            if (invalidatedTokens.contains(token)) {
+                System.out.println("유효성 검사 실패: 무효화된 토큰");
+                return false;
+            }
             String userId = extractUsername(token);
             System.out.println("유효성 검사할 토큰의 사용자 ID: " + userId);
             return !isTokenExpired(token);
@@ -72,5 +78,10 @@ public class JwtTokenProvider {
 
     private boolean isTokenExpired(String token) {
         return extractAllClaims(token).getExpiration().before(new Date());
+    }
+
+    // 유효하지 않은 토큰 목록에 무효화된 토큰을 저장하는 메서드.
+    public void invalidateToken(String token) {
+        invalidatedTokens.add(token);
     }
 }

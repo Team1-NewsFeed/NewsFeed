@@ -85,6 +85,8 @@ public class SignUpService {
             User user = userRepository.findByUserId(userId);
             if (user != null) {
                 System.out.println("로그아웃 요청 사용자: " + userId);
+                // 로그아웃시 리프레쉬 토큰 무효화 하기.
+                jwtTokenProvider.invalidateToken(user.getRefresh_token());
                 user.setRefresh_token(null); // 로그아웃시 리프레쉬 토큰 초기화 하기.
                 userRepository.save(user);
                 System.out.println("리프레쉬 토큰 null 완료: " + userId);
