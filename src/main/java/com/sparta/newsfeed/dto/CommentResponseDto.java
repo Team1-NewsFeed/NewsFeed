@@ -36,12 +36,12 @@ public class CommentResponseDto {
     public static CommentResponseDto toDto(Comment comment) {
         return new CommentResponseDto(
                 comment.getId(),
-                //comment.getUserId(),
-                //comment.getBoardUserId(),
+//                comment.getUserId(),
+//                comment.getBoardUserId(),
                 comment.getContents()
-                //comment.getLikeCount(),
-                //comment.getCreatedAt(),
-                //comment.getModifiedAt()
+//                comment.getLikeCount(),
+//                comment.getCreatedAt(),
+//                comment.getModifiedAt()
         );
     }
 }
