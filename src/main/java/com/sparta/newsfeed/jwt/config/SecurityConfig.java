@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -20,17 +21,27 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())  // CSRF 보호 비활성화
-                .authorizeHttpRequests(auth -> auth
-                        // 예외처리할 경로들. TODO : 이중에서 로그아웃과 회원탈퇴 경로는 빼야하지만 현재 인증 인가 어느쪽인지 모르곘는데 에러가 발생함.
-                        .requestMatchers("/user/signup","/user/login", "/user/logout", "/user/delete").permitAll() // 회원가입 경로는 인증 없이 접근 허용
-                        // 그외 요청을 모두 인증이 필요하게 설정.
-                        .anyRequest().authenticated()
-                );
+        http.csrf(csrf -> csrf.disable());  // JWT 토큰을 사용할 것이기에 CSRF 보호는 비활성화 한다.
 
-        http.addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class); // JWT 필터 등록
+        http.authorizeHttpRequests((authorizeRequests) ->
+                authorizeRequests
+                        .requestMatchers("/user/signup", "/user/login").permitAll() // 회원가입, 로그인 경로는 인증 없이 접근 허용
+                        .anyRequest().authenticated() // 그 외 요청은 모두 인증이 필요하게 설정
+        );
+
+        // 세션을 사용하지 않고 JWT 만을 사용하게 설정
+        http.sessionManagement((sessionManagement) ->
+                sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        );
+
+        // 특정 경로에 대해 JwtFilter를 적용
+        http.addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class); // JWT 필터 등록
 
         return http.build();
+    }
+
+    @Bean
+    public JwtFilter jwtFilter() {
+        return new JwtFilter();
     }
 }

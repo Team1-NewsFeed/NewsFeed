@@ -43,7 +43,7 @@ public class SignUpService {
             throw new IllegalArgumentException("탈퇴한 사용자 ID입니다.");
         }
 
-        User user = new User();
+        User user = new User(requestDto);
         user.setUser_id(requestDto.getUserId());
         user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
         user.setUserStatus(UserStatus.ACTIVE);  // 기본 상태를 ACTIVE로 설정
