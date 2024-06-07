@@ -25,11 +25,11 @@ public class SignUpRequestDto {
     private String password;
 
     //이름
-    @NotBlank(message = " 이름을 비워둘 수 없습니다.")
+//    @NotBlank(message = " 이름을 비워둘 수 없습니다.")
     private String username;
 
     //이매일
-    @NotBlank(message = " 이매일을 비워둘 수 없습니다.")
+//    @NotBlank(message = " 이매일을 비워둘 수 없습니다.")
     @Email
     private String email;
 
@@ -38,7 +38,4 @@ public class SignUpRequestDto {
 
     //유저 상태 코드
     private UserStatus userStatus = UserStatus.ACTIVE;
-}
-
-
 }

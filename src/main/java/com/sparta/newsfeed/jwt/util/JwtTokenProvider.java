@@ -4,59 +4,62 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import com.sparta.newsfeed.jwt.config.JwtConfig;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class JwtTokenProvider {
+@Component
+public class JwtTokenProvider {
 
-    private static SecretKey SECRET_KEY;
-    private static final long ACCESS_EXPIRATION = 1800000L; // 30 분간 지속되는 엑세스 토큰
-    private static final long REFRESH_EXPIRATION = 1209600000L; // 2 주간 지속되는 리프레쉬 토큰
+    private final SecretKey secretKey;
+    private final long accessExpiration;
+    private final long refreshExpiration;
 
-    static {
-        SECRET_KEY = Keys.hmacShaKeyFor(JwtConfig.staticSecretKey.getBytes());
+    public JwtTokenProvider(@Value("${jwt.secret.key}") String secretKey,
+                            @Value("${jwt.access.expiration}") long accessExpiration,
+                            @Value("${jwt.refresh.expiration}") long refreshExpiration) {
+        this.secretKey = Keys.hmacShaKeyFor(secretKey.getBytes());
+        this.accessExpiration = accessExpiration;
+        this.refreshExpiration = refreshExpiration;
     }
 
-    private JwtTokenProvider() {
-    }
-
-    public static String generateToken(String userId) {
+    public String generateToken(String userId) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, userId, ACCESS_EXPIRATION);
+        return createToken(claims, userId, accessExpiration);
     }
 
-    public static String generateRefreshToken(String userId) {
+    public String generateRefreshToken(String userId) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, userId, REFRESH_EXPIRATION);
+        return createToken(claims, userId, refreshExpiration);
     }
 
-    private static String createToken(Map<String, Object> claims, String subject, long expirationTime) {
+    private String createToken(Map<String, Object> claims, String subject, long expirationTime) {
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-                .signWith(SECRET_KEY)
+                .signWith(secretKey)
                 .compact();
     }
 
-    public static String extractUsername(String token) {
+    public String extractUsername(String token) {
         return extractAllClaims(token).getSubject();
     }
 
-    private static Claims extractAllClaims(String token) {
+    private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY)
+                .setSigningKey(secretKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
     }
 
-    public static Boolean validateToken(String token) {
+    public boolean validateToken(String token) {
         try {
             String userId = extractUsername(token);
             System.out.println("유효성 검사할 토큰의 사용자 ID: " + userId);
@@ -67,12 +70,7 @@ public final class JwtTokenProvider {
         }
     }
 
-    private static Boolean isTokenExpired(String token) {
+    private boolean isTokenExpired(String token) {
         return extractAllClaims(token).getExpiration().before(new Date());
-    }
-
-    // 토큰 만료 확인 메서드
-    public static boolean isTokenValid(String token) {
-        return !isTokenExpired(token);
     }
 }

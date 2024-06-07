@@ -7,7 +7,6 @@ import com.sparta.newsfeed.jwt.util.JwtTokenProvider;
 import com.sparta.newsfeed.repository.UserRepository;
 import jakarta.validation.Validation;
 import lombok.Getter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,30 +22,27 @@ public class SignUpService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+    private final JwtTokenProvider jwtTokenProvider;
 
-    @Autowired
-    public SignUpService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
+    public SignUpService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, JwtTokenProvider jwtTokenProvider) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     // 유저 회원가입 메서드
     public User addUser(SignUpRequestDto requestDto) {
-        // 중복된 사용자 ID 확인
         User existingUser = userRepository.findByUserId(requestDto.getUserId());
-        if (existingUser != null && existingUser.getUserStatus() == UserStatus.ACTIVE) {
-            throw new IllegalArgumentException("중복된 사용자 ID입니다.");
-        }
-
-        // 탈퇴한 사용자 ID 확인
-        if (existingUser != null && existingUser.getUserStatus() == UserStatus.WITHDRAWAL) {
-            throw new IllegalArgumentException("탈퇴한 사용자 ID입니다.");
+        if (existingUser != null) {
+            if (existingUser.getUserStatus() == UserStatus.ACTIVE) {
+                throw new IllegalArgumentException("중복된 사용자 ID입니다.");
+            } else if (existingUser.getUserStatus() == UserStatus.WITHDRAWAL) {
+                throw new IllegalArgumentException("탈퇴한 사용자 ID입니다.");
+            }
         }
 
         User user = new User(requestDto);
-        user.setUser_id(requestDto.getUserId());
         user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
-        user.setUserStatus(UserStatus.ACTIVE);  // 기본 상태를 ACTIVE로 설정
         return userRepository.save(user);
     }
 
@@ -66,8 +62,8 @@ public class SignUpService {
         }
 
         // 로그인 시 액세스 토큰 및 리프레시 토큰 생성 및 저장
-        String accessToken = JwtTokenProvider.generateToken(user.getUserId());
-        String refreshToken = JwtTokenProvider.generateRefreshToken(user.getUserId());
+        String accessToken = jwtTokenProvider.generateToken(user.getUserId());
+        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getUserId());
         user.setRefresh_token(refreshToken);
         userRepository.save(user);
 
@@ -83,18 +79,15 @@ public class SignUpService {
     public void logoutUser(String token) {
         try {
             System.out.println("로그아웃 요청을 받았습니다: " + token);
-            if (!JwtTokenProvider.isTokenValid(token)) {
-                throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
-            }
 
-            String userId = JwtTokenProvider.extractUsername(token);
+            String userId = jwtTokenProvider.extractUsername(token);
             System.out.println("로그아웃할 사용자 ID: " + userId);
             User user = userRepository.findByUserId(userId);
             if (user != null) {
                 System.out.println("로그아웃 요청 사용자: " + userId);
                 user.setRefresh_token(null); // 로그아웃시 리프레쉬 토큰 초기화 하기.
                 userRepository.save(user);
-                System.out.println("리프레쉬 토큰 초기화 완료: " + userId);
+                System.out.println("리프레쉬 토큰 null 완료: " + userId);
             } else {
                 System.out.println("사용자를 찾을 수 없습니다: " + userId);
             }
@@ -125,10 +118,3 @@ public class SignUpService {
         System.out.println("사용자 " + userId + "가 성공적으로 탈퇴되었습니다.");
     }
 }
-
-
-
-
-
-
-

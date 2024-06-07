@@ -32,11 +32,7 @@ public class User extends Timer {
     @Column(nullable = false)
     private UserStatus userStatus = UserStatus.ACTIVE;
 
-    public User(SignUpRequestDto requestDto) {
-        super();
-    }
-
-    public void User(SignUpRequestDto requestDto){
+    public User(SignUpRequestDto requestDto){
         this.userId = requestDto.getUserId();
         this.password = requestDto.getPassword();
         this.username = requestDto.getUsername();
@@ -45,4 +41,7 @@ public class User extends Timer {
         this.userStatus = requestDto.getUserStatus();
     }
 
+    public User() {
+
+    }
 }
