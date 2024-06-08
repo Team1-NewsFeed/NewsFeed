@@ -1,4 +1,4 @@
-package com.sparta.newsfeed.dtos.signup;
+package com.sparta.newsfeed.dto.UserDto;
 
 import com.sparta.newsfeed.entity.UserStatus;
 import jakarta.validation.constraints.Email;
@@ -25,11 +25,11 @@ public class SignUpRequestDto {
     private String password;
 
     //이름
-//    @NotBlank(message = " 이름을 비워둘 수 없습니다.")
+    @NotBlank(message = " 이름을 비워둘 수 없습니다.")
     private String username;
 
     //이매일
-//    @NotBlank(message = " 이매일을 비워둘 수 없습니다.")
+    @NotBlank(message = " 이매일을 비워둘 수 없습니다.")
     @Email
     private String email;
 
