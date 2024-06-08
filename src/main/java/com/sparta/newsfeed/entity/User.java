@@ -1,6 +1,6 @@
 package com.sparta.newsfeed.entity;
 
-import com.sparta.newsfeed.dto.SignupDto.SignUpRequestDto;
+import com.sparta.newsfeed.dto.SignUpDto.SignUpRequestDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

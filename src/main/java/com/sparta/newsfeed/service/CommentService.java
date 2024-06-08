@@ -1,17 +1,13 @@
 package com.sparta.newsfeed.service;
 
 import com.sparta.newsfeed.dto.CommentRequestDto;
-import com.sparta.newsfeed.dto.CommentResponseDto;
 import com.sparta.newsfeed.entity.Board;
 import com.sparta.newsfeed.entity.Comment;
 import com.sparta.newsfeed.repository.BoardRepository;
 import com.sparta.newsfeed.repository.CommentRepository;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

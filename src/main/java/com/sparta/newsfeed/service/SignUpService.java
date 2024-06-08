@@ -1,6 +1,6 @@
 package com.sparta.newsfeed.service;
 
-import com.sparta.newsfeed.dto.SignupDto.SignUpRequestDto;
+import com.sparta.newsfeed.dto.SignUpDto.SignUpRequestDto;
 import com.sparta.newsfeed.entity.User;
 import com.sparta.newsfeed.entity.UserStatus;
 import com.sparta.newsfeed.jwt.util.JwtTokenProvider;

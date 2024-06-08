@@ -1,7 +1,7 @@
 package com.sparta.newsfeed.controller;
 
 import com.sparta.newsfeed.dto.MessageDto.MessageResponseDto;
-import com.sparta.newsfeed.dto.SignupDto.SignUpRequestDto;
+import com.sparta.newsfeed.dto.SignUpDto.SignUpRequestDto;
 import com.sparta.newsfeed.jwt.util.JwtTokenProvider;
 import com.sparta.newsfeed.service.SignUpService;
 import jakarta.validation.Valid;

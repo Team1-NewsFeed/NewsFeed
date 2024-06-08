@@ -1,4 +1,4 @@
-package com.sparta.newsfeed.dto.SignupDto;
+package com.sparta.newsfeed.dto.SignUpDto;
 
 public class SignUpResponseDto {
 
