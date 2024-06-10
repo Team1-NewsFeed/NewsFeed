@@ -199,7 +199,11 @@ public class SignUpService {
                               HttpServletResponse response) {
         User user = jwtTokenProvider.getTokenUser(request);
         System.out.println("회원 탈퇴 요청을 받았습니다: " + user.getUsername());
-        if (user == null)throw new IllegalArgumentException("유저 아이디가 올바르지 않습니다.");
+        if (user == null)throw new IllegalArgumentException("해당 유저는 존재하지 않습니다.");
+
+        // 아이디와 비밀번호 검증 로직 재사용
+        userlogin(loginUpRequestDto, user);
+
         if (!passwordEncoder.matches(loginUpRequestDto.getPassword(), user.getPassword()))throw new IllegalArgumentException("유저 비밀번호가 올바르지 않습니다.");
 
         if (user.getUserStatus() == UserStatus.WITHDRAWAL) {
