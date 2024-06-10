@@ -23,6 +23,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -30,6 +35,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -53,9 +59,8 @@ public class BoardService {
         return board.getContents() + " 생성 완료";
     }
 
-    /*// 개시판 만들때 파일도 같이 넣음
+    // 개시판 만들때 파일도 같이 넣음
     public String create_m_board(HttpServletRequest servletRequest, MultipartFile image, MultipartFile movie, String board) {
-
         try {
             User user = jwt.getTokenUser(servletRequest);
             Board new_board = new Board(user, getStringBoard(board));
@@ -63,19 +68,42 @@ public class BoardService {
 
             Multimedia multimedia = new Multimedia();
             multimedia.setBoard(new_board);
+
             if (image != null && !image.isEmpty() && image.getContentType() != null && image.getContentType().toLowerCase().contains("image")) {
-                multimedia.setImage(image.getBytes());
+                String imageKey = "images/" + UUID.randomUUID().toString();
+                uploadFileToS3(imageKey, image.getBytes(), image.getContentType());
+                multimedia.setImageUrl(getS3Url(imageKey));
             }
 
             if (movie != null && !movie.isEmpty() && movie.getContentType() != null && (movie.getContentType().toLowerCase().contains("mp4") || movie.getContentType().toLowerCase().contains("avi"))) {
-                multimedia.setMovie(movie.getBytes());
+                String movieKey = "movies/" + UUID.randomUUID().toString();
+                uploadFileToS3(movieKey, movie.getBytes(), movie.getContentType());
+                multimedia.setMovieUrl(getS3Url(movieKey));
             }
+
             multimediaRepository.save(multimedia);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         return "생성 완료";
-    }*/
+    }
+
+    // s3 사용
+    private void uploadFileToS3(String key, byte[] bytes, String contentType) {
+        try (S3Client s3Client = S3Client.builder().region(Region.US_EAST_1).build()) {
+            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                    .bucket("onebytenewsfeed")
+                    .key(key)
+                    .contentType(contentType)
+                    .build();
+            RequestBody requestBody = RequestBody.fromBytes(bytes);
+            PutObjectResponse putObjectResponse = s3Client.putObject(putObjectRequest, requestBody);
+        }
+    }
+
+    private String getS3Url(String key) {
+        return "https://onebytenewsfeed.s3.amazonaws.com/" + key;
+    }
 
     // 개시판 전채 조회
     @Transactional
