@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,8 +32,7 @@ public class BoardController {
         return boardService.create_board(servletRequest,boardRequestDto);
     }
 
-    /*@PostMapping("/board/create/m") // Multimedia의 m
-
+    @PostMapping("/board/create/m") // Multimedia의 m
     @Operation(summary = "게시물 + 미디어 생성", tags = {"게시물"})
     @Parameters({
             @Parameter(name = "image",description = "이미지 삽입시"),
@@ -47,7 +47,7 @@ public class BoardController {
             @RequestPart(required = false) MultipartFile movie,
             @RequestPart String board) {
         return boardService.create_m_board(servletRequest, image, movie, board);
-    }*/
+    }
 
     @GetMapping("/board/{page}/{view}")
     @Operation(summary = "개시물 전체 조회", tags = {"게시물"})
