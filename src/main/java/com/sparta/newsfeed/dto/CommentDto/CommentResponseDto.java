@@ -31,8 +31,8 @@ public class CommentResponseDto {
     this.user_id = comment.getUser().getId();
     this.board_user_id = comment.getBoard().getUser().getId();
     this.contents = comment.getContents();
-    this.create_at = comment.getCreated_time();
-    this.modified_at = comment.getModified_time();
+    this.create_at = comment.getCreatedTime();
+    this.modified_at = comment.getModifiedTime();
     this.like_count = like_count;
     }
 
@@ -41,8 +41,8 @@ public class CommentResponseDto {
         this.user_id = comment.getUser().getId();
         this.board_user_id = comment.getBoard().getUser().getId();
         this.contents = comment.getContents();
-        this.create_at = comment.getCreated_time();
-        this.modified_at = comment.getModified_time();
+        this.create_at = comment.getCreatedTime();
+        this.modified_at = comment.getModifiedTime();
         this.like_count = like_count;
         this.massage = massage;
     }

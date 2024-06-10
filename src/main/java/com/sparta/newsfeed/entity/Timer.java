@@ -16,10 +16,10 @@ public abstract class Timer {
     @CreatedDate
     @Column(updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime created_time;
+    private LocalDateTime createdTime;
 
     @LastModifiedDate
     @Column
     @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime modified_time;
+    private LocalDateTime modifiedTime;
 }

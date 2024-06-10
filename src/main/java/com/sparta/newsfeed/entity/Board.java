@@ -28,7 +28,7 @@ public class Board extends Timer{
     @JoinColumn(name = "user_id" ,insertable = false, updatable = false)
     private User user;
 
-    private Long Likecounts;
+    private Long likecounts;
 
     //댓글
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
@@ -43,7 +43,7 @@ public class Board extends Timer{
     }
 
     public void setLikecounts(Long likecounts) {
-        this.Likecounts = likecounts;
+        this.likecounts = likecounts;
     }
 
 
@@ -55,7 +55,7 @@ public class Board extends Timer{
     public Board(User user, BoardRequestDto boardRequestDto, Long likecounts) {
         this.user_id = user.getId();
         this.contents = boardRequestDto.getContents();
-        this.Likecounts = likecounts;
+        this.likecounts = likecounts;
     }
 
     public void update( BoardRequestDto boardRequestDto) {

@@ -13,25 +13,35 @@ public class BoardResponseDto {
     private String board_contents;
     private LocalDateTime created_time;
     private LocalDateTime modifie_time;
-    private Long like_count;
+    private Long Likecounts;
     private String massage;
 
-    public BoardResponseDto(Board board ,long like_count) {
+    public BoardResponseDto(Board board) {
         this.board_id = board.getId();
         this.board_user_id = board.getUser_id();
         this.board_contents = board.getContents();
-        this.created_time = board.getCreated_time();
-        this.modifie_time = board.getModified_time();
-        this.like_count = like_count;
+        this.created_time = board.getCreatedTime();
+        this.modifie_time = board.getModifiedTime();
+        this.Likecounts = board.getLikecounts();
+        this.massage = "";
     }
 
-    public BoardResponseDto(Board board ,long like_count ,String massage) {
+    public BoardResponseDto(Board board ,long Likecounts) {
         this.board_id = board.getId();
         this.board_user_id = board.getUser_id();
         this.board_contents = board.getContents();
-        this.created_time = board.getCreated_time();
-        this.modifie_time = board.getModified_time();
-        this.like_count = like_count;
+        this.created_time = board.getCreatedTime();
+        this.modifie_time = board.getModifiedTime();
+        this.Likecounts = Likecounts;
+    }
+
+    public BoardResponseDto(Board board , long Likecounts, String massage) {
+        this.board_id = board.getId();
+        this.board_user_id = board.getUser_id();
+        this.board_contents = board.getContents();
+        this.created_time = board.getCreatedTime();
+        this.modifie_time = board.getModifiedTime();
+        this.Likecounts = Likecounts;
         this.massage = massage;
     }
 

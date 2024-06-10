@@ -6,9 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public interface BoardRepository extends JpaRepository<Board, Long> {
-    List<Board> findByUser_id(Long id);
-//    Page<Board> findAllByCreatedTimeBetween(LocalDateTime startDateTime, LocalDateTime endDateTime, Pageable pageable);
+    Page<Board> findAllByCreatedTimeBetween(LocalDateTime start, LocalDateTime end, Pageable pageable);
 }

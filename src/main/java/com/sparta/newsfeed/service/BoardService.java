@@ -79,31 +79,29 @@ public class BoardService {
 
     // 개시판 전채 조회
     @Transactional
-    public List<BoardResponseDto> get_all_board(
-            HttpServletRequest servletRequest,
-            int page,
-            boolean is,
-            LocalDate startDate, LocalDate endDate){
+    public Page<BoardResponseDto> get_all_board(HttpServletRequest servletRequest, int page, int view, LocalDateTime start, LocalDateTime end) {
+        Sort sort = null;
 
-        Sort.Direction direction = is ? Sort.Direction.ASC : Sort.Direction.DESC;
-        Sort sort =Sort.by(direction);
+        switch (view) {
+            case 1 -> sort = Sort.by(Sort.Direction.DESC, "likecounts");
+            case 2 -> sort= Sort.by(Sort.Direction.ASC, "likecounts");
+            case 3 -> {if (start == null || end == null) throw new IllegalArgumentException("start와 end 날짜는 필수입니다.");
+                sort = Sort.by(Sort.Direction.DESC, "createdTime");
+            }
+            case 4 -> {if (start == null || end == null) throw new IllegalArgumentException("start와 end 날짜는 필수입니다.");
+                sort = Sort.by(Sort.Direction.ASC, "createdTime");
+            }
+            default ->  Sort.by(Sort.Direction.DESC, "likecounts");
+        }
+        if(sort == null) sort = Sort.by(Sort.Direction.DESC, "createdTime");
+
         Pageable pageable = PageRequest.of(page, 10, sort);
 
-        Page<Board> boards;
-/*        if(startDate != null && endDate != null) {
-            LocalDateTime startDateTime = startDate.atStartOfDay();
-            LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
-            boards = boardRepository.findAllByCreatedTimeBetween(startDateTime, endDateTime, pageable);
-        }else{*/
-            boards = boardRepository.findAll(pageable);
-//        }
-        List<BoardResponseDto> boardResponseDtos = new ArrayList<>();
-        for (Board board : boards) {
-            long likeCount = getLikeCount(board.getId());
-            boardResponseDtos.add(new BoardResponseDto(board, likeCount));
-        }
-        return boardResponseDtos;
+        Page<Board> boards = boardRepository.findAll(pageable);
+        return boards.map(BoardResponseDto::new);
     }
+
+
 
     // 개시판 특정 조회
     public BoardResponseDto get_board(long boardId) {
